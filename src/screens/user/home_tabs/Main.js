@@ -1,23 +1,11 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
 import React, {useEffect, useState} from 'react';
+import Header from '../../common/Header';
 import firestore from '@react-native-firebase/firestore';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-const Items = () => {
-  const isFocused = useIsFocused();
-  const navigation = useNavigation();
+const Main = () => {
   const [items, setItems] = useState([]);
   useEffect(() => {
-    getItems();
-  }, [isFocused]);
-  const getItems = () => {
-    firestore()
+    const subscriber = firestore()
       .collection('items')
       .get()
       .then(querySnapshot => {
@@ -36,20 +24,12 @@ const Items = () => {
         });
         setItems(tempData);
       });
-  };
-
-  const deleteItem = docId => {
-    firestore()
-      .collection('items')
-      .doc(docId)
-      .delete()
-      .then(() => {
-        console.log('User deleted!');
-        getItems();
-      });
-  };
+    // Stop listening for updates when no longer required
+    return () => subscriber();
+  }, []);
   return (
     <View style={styles.container}>
+      <Header title={'FoodApp'} />
       <FlatList
         data={items}
         renderItem={({item, index}) => {
@@ -71,29 +51,7 @@ const Items = () => {
                   </Text>
                 </View>
               </View>
-              <View style={{margin: 10}}>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate('EditItem', {
-                      data: item.data,
-                      id: item.id,
-                    });
-                  }}>
-                  <Image
-                    source={require('../images/edit.png')}
-                    style={styles.icon}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    deleteItem(item.id);
-                  }}>
-                  <Image
-                    source={require('../images/delete.png')}
-                    style={[styles.icon, {marginTop: 20}]}
-                  />
-                </TouchableOpacity>
-              </View>
+              
             </View>
           );
         }}
@@ -102,11 +60,9 @@ const Items = () => {
   );
 };
 
-export default Items;
+export default Main;
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: {flex: 1},
   itemView: {
     flexDirection: 'row',
     width: '90%',
@@ -150,9 +106,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textDecorationLine: 'line-through',
     marginLeft: 5,
-  },
-  icon: {
-    width: 24,
-    height: 24,
   },
 });

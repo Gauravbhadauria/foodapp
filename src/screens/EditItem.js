@@ -83,7 +83,7 @@ const EditItem = ({navigation}) => {
       })
       .then(() => {
         console.log('User added!');
-        navigation.goBack()
+        navigation.goBack();
       });
   };
 

@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.17.11",
     "@react-native-firebase/app": "^16.4.6",
     "@react-native-firebase/firestore": "^16.4.6",
     "@react-native-firebase/storage": "^16.4.6",

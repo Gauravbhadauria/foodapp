@@ -5,36 +5,56 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
+import Loader from '../common/Loader';
 import firestore from '@react-native-firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Login = ({navigation}) => {
+const UserSignup = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const adminLogin = async () => {
-    const users = await firestore().collection('admin').get();
-    console.log(users.password + '  ' + password);
-    if (
-      email == users.docs[0]._data.email &&
-      password == users.docs[0]._data.password
-    ) {
-      await AsyncStorage.setItem('EMAIL', email);
-      navigation.navigate('Dashboard');
-    } else {
-      alert('wrong email/pass');
-    }
+  const [name, setName] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const saveUser = () => {
+    setModalVisible(true);
+    firestore()
+      .collection('users')
+      .add({
+        name: name,
+        email: email,
+        password: password,
+        mobile: mobile,
+      })
+      .then(res => {
+        setModalVisible(false);
+        navigation.goBack();
+      })
+      .catch(error => {
+        setModalVisible(false);
+        console.log(error);
+      });
   };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Admin Login</Text>
+      <Text style={styles.title}>Sign up</Text>
+      <TextInput
+        style={styles.inputStyle}
+        placeholder={'Enter Name'}
+        value={name}
+        onChangeText={txt => setName(txt)}
+      />
       <TextInput
         style={styles.inputStyle}
         placeholder={'Enter Email Id'}
         value={email}
         onChangeText={txt => setEmail(txt)}
+      />
+      <TextInput
+        style={styles.inputStyle}
+        placeholder={'Enter Mobile'}
+        keyboardType={'number-pad'}
+        value={mobile}
+        onChangeText={txt => setMobile(txt)}
       />
       <TextInput
         style={styles.inputStyle}
@@ -45,19 +65,26 @@ const Login = ({navigation}) => {
       <TouchableOpacity
         style={styles.loginBtn}
         onPress={() => {
-          if (email !== '' && password !== '') {
-            adminLogin();
+          if (
+            email !== '' &&
+            password !== '' &&
+            name !== '' &&
+            mobile !== '' &&
+            mobile.length > 9
+          ) {
+            saveUser();
           } else {
             alert('Please Enter Data');
           }
         }}>
-        <Text style={styles.btnText}>Login</Text>
+        <Text style={styles.btnText}>Sign up</Text>
       </TouchableOpacity>
+      <Loader modalVisible={modalVisible} setModalVisible={setModalVisible} />
     </View>
   );
 };
 
-export default Login;
+export default UserSignup;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
