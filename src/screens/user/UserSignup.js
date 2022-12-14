@@ -8,7 +8,7 @@ import {
 import React, {useState} from 'react';
 import Loader from '../common/Loader';
 import firestore from '@react-native-firebase/firestore';
-
+import uuid from 'react-native-uuid';
 const UserSignup = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,13 +17,16 @@ const UserSignup = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const saveUser = () => {
     setModalVisible(true);
+    const userId = uuid.v4();
     firestore()
       .collection('users')
-      .add({
+      .doc(userId)
+      .set({
         name: name,
         email: email,
         password: password,
         mobile: mobile,
+        userId: userId,
       })
       .then(res => {
         setModalVisible(false);

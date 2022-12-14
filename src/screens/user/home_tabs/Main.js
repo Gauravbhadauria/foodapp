@@ -1,11 +1,25 @@
-import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Header from '../../common/Header';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
+let userId = '';
 const Main = () => {
   const [items, setItems] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
   useEffect(() => {
-    const subscriber = firestore()
+    // const subscriber =
+    firestore()
       .collection('items')
       .get()
       .then(querySnapshot => {
@@ -25,11 +39,54 @@ const Main = () => {
         setItems(tempData);
       });
     // Stop listening for updates when no longer required
-    return () => subscriber();
+    // return () => subscriber();
   }, []);
+  useEffect(() => {
+    getCartItems();
+  }, [isFocused]);
+  const getCartItems = async () => {
+    userId = await AsyncStorage.getItem('USERID');
+    const user = await firestore().collection('users').doc(userId).get();
+    setCartCount(user._data.cart.length);
+  };
+  const onAddToCart = async (item, index) => {
+    const user = await firestore().collection('users').doc(userId).get();
+    console.log(user._data.cart);
+    let tempDart = [];
+    tempDart = user._data.cart;
+    if (tempDart.length > 0) {
+      let existing = false;
+      tempDart.map(itm => {
+        if (itm.id == item.id) {
+          existing = true;
+          itm.data.qty = itm.data.qty + 1;
+        }
+      });
+      if (existing == false) {
+        tempDart.push(item);
+      }
+      firestore().collection('users').doc(userId).update({
+        cart: tempDart,
+      });
+    } else {
+      tempDart.push(item);
+    }
+    console.log(tempDart);
+    firestore().collection('users').doc(userId).update({
+      cart: tempDart,
+    });
+    getCartItems();
+  };
   return (
     <View style={styles.container}>
-      <Header title={'FoodApp'} />
+      <Header
+        title={'FoodApp'}
+        icon={require('../../../images/cart.png')}
+        count={cartCount}
+        onClickIcon={() => {
+          navigation.navigate('Cart');
+        }}
+      />
       <FlatList
         data={items}
         renderItem={({item, index}) => {
@@ -51,7 +108,13 @@ const Main = () => {
                   </Text>
                 </View>
               </View>
-              
+              <TouchableOpacity
+                style={styles.addToCartBtn}
+                onPress={() => {
+                  onAddToCart(item, index);
+                }}>
+                <Text style={{color: '#fff'}}>Add To cart</Text>
+              </TouchableOpacity>
             </View>
           );
         }}
@@ -73,6 +136,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     height: 100,
     marginBottom: 10,
+    alignItems: 'center',
   },
   itemImage: {
     width: 90,
@@ -81,7 +145,7 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   nameView: {
-    width: '53%',
+    width: '35%',
     margin: 10,
   },
   priceView: {
@@ -106,5 +170,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textDecorationLine: 'line-through',
     marginLeft: 5,
+  },
+  addToCartBtn: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 10,
   },
 });

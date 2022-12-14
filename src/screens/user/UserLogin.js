@@ -9,7 +9,7 @@ import React, {useEffect, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../common/Loader';
-import { translation } from '../../utils';
+import {translation} from '../../utils';
 
 const UserLogin = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -21,7 +21,7 @@ const UserLogin = ({navigation}) => {
   }, []);
 
   const getLang = async () => {
-    console.log(await AsyncStorage.getItem('LANG'))
+    console.log(await AsyncStorage.getItem('LANG'));
     setSelectedLang(parseInt(await AsyncStorage.getItem('LANG')));
   };
   const adminLogin = async () => {
@@ -34,12 +34,13 @@ const UserLogin = ({navigation}) => {
       .then(querySnapshot => {
         setModalVisible(false);
         /* ... */
+        console.log(querySnapshot.docs);
         if (querySnapshot.docs[0]._data !== null) {
           if (
             querySnapshot.docs[0]._data.email === email &&
             querySnapshot.docs[0]._data.password === password
           ) {
-            goToNextScreen();
+            goToNextScreen(querySnapshot.docs[0]._data.userId);
           }
         }
       })
@@ -50,8 +51,9 @@ const UserLogin = ({navigation}) => {
       });
   };
 
-  const goToNextScreen = async () => {
+  const goToNextScreen = async userId => {
     await AsyncStorage.setItem('EMAIL', email);
+    await AsyncStorage.setItem('USERID', userId);
     navigation.navigate('Home');
   };
   return (

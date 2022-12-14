@@ -10,6 +10,7 @@ import SelectLogin from './screens/user/SelectLogin';
 import UserLogin from './screens/user/UserLogin';
 import UserSignup from './screens/user/UserSignup';
 import Home from './screens/user/Home';
+import Cart from './screens/user/Cart';
 const Stack = createStackNavigator();
 const AppNavigator = () => {
   return (
@@ -54,6 +55,11 @@ const AppNavigator = () => {
           component={Home}
           name="Home"
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          component={Cart}
+          name="Cart"
+          options={{headerShown: true}}
         />
       </Stack.Navigator>
     </NavigationContainer>
