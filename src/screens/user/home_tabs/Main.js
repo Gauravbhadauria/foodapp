@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   nameView: {
-    width: '35%',
+    width: '30%',
     margin: 10,
   },
   priceView: {

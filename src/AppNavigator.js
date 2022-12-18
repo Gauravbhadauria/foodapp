@@ -11,6 +11,9 @@ import UserLogin from './screens/user/UserLogin';
 import UserSignup from './screens/user/UserSignup';
 import Home from './screens/user/Home';
 import Cart from './screens/user/Cart';
+import Checkout from './screens/user/checkout/Checkout';
+import Address from './screens/user/checkout/Address';
+import AddNewAddress from './screens/user/checkout/AddNewAddress';
 const Stack = createStackNavigator();
 const AppNavigator = () => {
   return (
@@ -59,6 +62,21 @@ const AppNavigator = () => {
         <Stack.Screen
           component={Cart}
           name="Cart"
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
+          component={Checkout}
+          name="Checkout"
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
+          component={Address}
+          name="Address"
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
+          component={AddNewAddress}
+          name="AddNewAddress"
           options={{headerShown: true}}
         />
       </Stack.Navigator>

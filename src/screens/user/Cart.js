@@ -10,8 +10,9 @@ import React, {useEffect, useState} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
+import {StripeProvider} from '@stripe/stripe-react-native';
 let userId = '';
-const Cart = () => {
+const Cart = ({navigation}) => {
   const isFocused = useIsFocused();
   const [cartList, setCartList] = useState([]);
   useEffect(() => {
@@ -68,6 +69,7 @@ const Cart = () => {
     });
     return total;
   };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -144,24 +146,28 @@ const Cart = () => {
           );
         }}
       />
-      {cartList.length>0 && ( <View style={styles.checkoutView}>
-        <Text style={{color: '#000', fontWeight: '600'}}>
-          {'Items(' + cartList.length + ')\nTotal: $' + getTotal()}
-        </Text>
-        <TouchableOpacity
-          style={[
-            styles.addToCartBtn,
-            {
-              width: 100,
-              height: 40,
-              justifyContent: 'center',
-              alignItems: 'center',
-            },
-          ]}>
-          <Text style={{color: '#fff'}}>Checkout</Text>
-        </TouchableOpacity>
-      </View>)}
-     
+      {cartList.length > 0 && (
+        <View style={styles.checkoutView}>
+          <Text style={{color: '#000', fontWeight: '600'}}>
+            {'Items(' + cartList.length + ')\nTotal: $' + getTotal()}
+          </Text>
+          <TouchableOpacity
+            style={[
+              styles.addToCartBtn,
+              {
+                width: 100,
+                height: 40,
+                justifyContent: 'center',
+                alignItems: 'center',
+              },
+            ]}
+            onPress={() => {
+              navigation.navigate('Checkout');
+            }}>
+            <Text style={{color: '#fff'}}>Checkout</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -190,7 +196,7 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   nameView: {
-    width: '35%',
+    width: '30%',
     margin: 10,
   },
   priceView: {
