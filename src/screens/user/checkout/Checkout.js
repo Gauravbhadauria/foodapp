@@ -1,8 +1,16 @@
-import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import {useIsFocused} from '@react-navigation/native';
+import RazorpayCheckout from 'react-native-razorpay';
 let userId = '';
 const Checkout = ({navigation}) => {
   const [cartList, setCartList] = useState([]);
@@ -100,6 +108,38 @@ const Checkout = ({navigation}) => {
         }}>
         {selectedAddress}
       </Text>
+      <TouchableOpacity
+        style={styles.checkoutBtn}
+        onPress={() => {
+          var options = {
+            description: 'Credits towards consultation',
+            image: require('../../../images/logo.png'),
+            currency: 'INR',
+            key: 'your razorpay key',
+            amount: getTotal() * 100,
+            name: 'Food App',
+            order_id: '', //Replace this with an order_id created using Orders API.
+            prefill: {
+              email: 'gaurav.kumar@example.com',
+              contact: '9191919191',
+              name: 'Gaurav Kumar',
+            },
+            theme: {color: '#EC9912'},
+          };
+          RazorpayCheckout.open(options)
+            .then(data => {
+              // handle success
+              alert(`Success: ${data.razorpay_payment_id}`);
+            })
+            .catch(error => {
+              // handle failure
+              alert(`Error: ${error.code} | ${error.description}`);
+            });
+        }}>
+        <Text style={{color: '#fff', fontSize: 18, fontWeight: '600'}}>
+          Pay Now {'$' + getTotal()}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -171,5 +211,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     textDecorationLine: 'underline',
+  },
+  checkoutBtn: {
+    width: '90%',
+    height: 50,
+    borderRadius: 10,
+    backgroundColor: 'green',
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
