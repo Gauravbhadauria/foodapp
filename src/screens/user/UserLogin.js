@@ -40,7 +40,11 @@ const UserLogin = ({navigation}) => {
             querySnapshot.docs[0]._data.email === email &&
             querySnapshot.docs[0]._data.password === password
           ) {
-            goToNextScreen(querySnapshot.docs[0]._data.userId);
+            goToNextScreen(
+              querySnapshot.docs[0]._data.userId,
+              querySnapshot.docs[0]._data.mobile,
+              querySnapshot.docs[0]._data.name,
+            );
           }
         }
       })
@@ -51,9 +55,11 @@ const UserLogin = ({navigation}) => {
       });
   };
 
-  const goToNextScreen = async userId => {
+  const goToNextScreen = async (userId, mobile, name) => {
     await AsyncStorage.setItem('EMAIL', email);
     await AsyncStorage.setItem('USERID', userId);
+    await AsyncStorage.setItem('MOBILE', mobile);
+    await AsyncStorage.setItem('NAME', name);
     navigation.navigate('Home');
   };
   return (

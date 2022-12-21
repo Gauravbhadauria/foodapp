@@ -14,6 +14,7 @@ import Cart from './screens/user/Cart';
 import Checkout from './screens/user/checkout/Checkout';
 import Address from './screens/user/checkout/Address';
 import AddNewAddress from './screens/user/checkout/AddNewAddress';
+import OrderStatus from './screens/user/checkout/OrderStatus';
 const Stack = createStackNavigator();
 const AppNavigator = () => {
   return (
@@ -78,6 +79,11 @@ const AppNavigator = () => {
           component={AddNewAddress}
           name="AddNewAddress"
           options={{headerShown: true}}
+        />
+        <Stack.Screen
+          component={OrderStatus}
+          name="OrderStatus"
+          options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

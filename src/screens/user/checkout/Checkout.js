@@ -54,6 +54,49 @@ const Checkout = ({navigation}) => {
     });
     return total;
   };
+  const payNow = async () => {
+    const email = await AsyncStorage.getItem('EMAIL');
+    const name = await AsyncStorage.getItem('NAME');
+    const mobile = await AsyncStorage.getItem('MOBILE');
+    var options = {
+      description: 'Credits towards consultation',
+      image: require('../../../images/logo.png'),
+      currency: 'INR',
+      key: 'rzp_test_2VYHup8J177yIx',
+      amount: getTotal() * 100,
+      name: 'Food App',
+      order_id: '', //Replace this with an order_id created using Orders API.
+      prefill: {
+        email: email,
+        contact: mobile,
+        name: name,
+      },
+      theme: {color: '#EC9912'},
+    };
+    RazorpayCheckout.open(options)
+      .then(data => {
+        // handle success
+      
+        navigation.navigate('OrderStatus', {
+          status: 'success',
+          paymentId: data.razorpay_payment_id,
+          cartList: cartList,
+          total: getTotal(),
+          address: selectedAddress,
+          userId: userId,
+          userName: name,
+          userEmail: email,
+          userMobile: mobile,
+        });
+      })
+      .catch(error => {
+        // handle failure
+      
+        navigation.navigate('OrderStatus', {
+          status: 'failed',
+        });
+      });
+  };
   return (
     <View style={styles.container}>
       <View>
@@ -109,32 +152,18 @@ const Checkout = ({navigation}) => {
         {selectedAddress}
       </Text>
       <TouchableOpacity
-        style={styles.checkoutBtn}
+        disabled={selectedAddress == 'No Selected Address' ? true : false}
+        style={[
+          styles.checkoutBtn,
+          {
+            backgroundColor:
+              selectedAddress == 'No Selected Address' ? '#DADADA' : 'green',
+          },
+        ]}
         onPress={() => {
-          var options = {
-            description: 'Credits towards consultation',
-            image: require('../../../images/logo.png'),
-            currency: 'INR',
-            key: 'your razorpay key',
-            amount: getTotal() * 100,
-            name: 'Food App',
-            order_id: '', //Replace this with an order_id created using Orders API.
-            prefill: {
-              email: 'gaurav.kumar@example.com',
-              contact: '9191919191',
-              name: 'Gaurav Kumar',
-            },
-            theme: {color: '#EC9912'},
-          };
-          RazorpayCheckout.open(options)
-            .then(data => {
-              // handle success
-              alert(`Success: ${data.razorpay_payment_id}`);
-            })
-            .catch(error => {
-              // handle failure
-              alert(`Error: ${error.code} | ${error.description}`);
-            });
+          if (selectedAddress !== 'No Selected Address') {
+            payNow();
+          }
         }}>
         <Text style={{color: '#fff', fontSize: 18, fontWeight: '600'}}>
           Pay Now {'$' + getTotal()}
