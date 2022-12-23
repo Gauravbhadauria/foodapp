@@ -76,7 +76,7 @@ const Checkout = ({navigation}) => {
     RazorpayCheckout.open(options)
       .then(data => {
         // handle success
-      
+       
         navigation.navigate('OrderStatus', {
           status: 'success',
           paymentId: data.razorpay_payment_id,
@@ -91,7 +91,7 @@ const Checkout = ({navigation}) => {
       })
       .catch(error => {
         // handle failure
-      
+       
         navigation.navigate('OrderStatus', {
           status: 'failed',
         });

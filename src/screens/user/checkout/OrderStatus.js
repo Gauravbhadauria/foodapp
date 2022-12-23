@@ -9,8 +9,13 @@ const OrderStatus = ({navigation}) => {
       placeOrder();
     }
   }, []);
-  const placeOrder = () => {
+  const placeOrder = async () => {
     let tempOrders = [];
+    let user = await firestore()
+      .collection('users')
+      .doc(route.params.userId)
+      .get();
+    tempOrders = user._data.orders;
     tempOrders.push({
       items: route.params.cartList,
       address: route.params.address,
@@ -19,11 +24,27 @@ const OrderStatus = ({navigation}) => {
       userMobile: route.params.userMobile,
       userId: route.params.userId,
       orderTotal: route.params.total,
+      paymentId: route.params.paymentId,
     });
     firestore().collection('users').doc(route.params.userId).update({
       cart: [],
       orders: tempOrders,
     });
+    firestore()
+      .collection('orders')
+      .add({
+        data: {
+          items: route.params.cartList,
+          address: route.params.address,
+          orderBy: route.params.userName,
+          userEmail: route.params.userEmail,
+          userMobile: route.params.userMobile,
+          userId: route.params.userId,
+          orderTotal: route.params.total,
+          paymentId: route.params.paymentId,
+        },
+        orderBy: route.params.userId,
+      });
   };
   return (
     <View style={styles.container}>
